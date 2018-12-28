@@ -1,5 +1,5 @@
-local map_width = 50
-local map_height = 50
+local map_width = 31
+local map_height = 31
 local max_length = 10
 local min_length = 5
 local map_data = {}
@@ -189,18 +189,36 @@ local saveMapPng = function(filename)
     screenshot:SavePNG(fileSystem:GetProgramDir() .. "Resources/" .. filename .. ".png")
 end
 
+local getStarNode = function()
+    local x
+    local y
+    local find = false
+    while find == false do
+        x = math.random(1, map_width - 2)
+        y = math.random(1, map_height - 2)
+
+        if map_data[posToIdx(x, y)] == 0 and map_data[posToIdx(x-1, y)] == 0 and map_data[posToIdx(x+1, y)] == 0 and map_data[posToIdx(x, y-1)] == 0 and map_data[posToIdx(x, y+1)] == 0 then
+            find = true
+        end
+    end
+
+    return x, y
+end
+
 local genPath = function()
-    local x = 1
-    local y = 1
+    local x,y = getStarNode()
     local stack = {}  
     local times = 0
-    local lastx = 1
-    local lasty = 1
-
+    local lastx = x
+    local lasty = y
+   
     map_data[posToIdx(x, y)] = 1
 
     stack[#stack + 1] = {pos = {x,y}, dir = "d"}
-    map_end[#map_end + 1] = {pos = {x,y}, dir = "u"}
+    stack[#stack + 1] = {pos = {x,y}, dir = "u"}
+    stack[#stack + 1] = {pos = {x,y}, dir = "l"}
+    stack[#stack + 1] = {pos = {x,y}, dir = "r"}
+    --map_end[#map_end + 1] = {pos = {x,y}, dir = "u"}
 
     while #stack > 0 do
         randomhead = math.random(1, #stack)
@@ -208,9 +226,9 @@ local genPath = function()
         table.remove(stack, randomhead)
         lastx = node.pos[1]
         lasty = node.pos[2]
-  
+        
         moveNode(node)
- 
+      
         if math.abs(lastx - node.pos[1]) >= 1 or math.abs(lasty - node.pos[2]) >= 1 then           
             stack[#stack + 1] = {pos = {node.pos[1], node.pos[2]}, dir = "r"}
             stack[#stack + 1] = {pos = {node.pos[1], node.pos[2]}, dir = "l"}
