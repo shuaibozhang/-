@@ -1,0 +1,1 @@
+GameScripts/main.lua -w -x 800 -y 480 -p Data;CoreData;Resources -s true
